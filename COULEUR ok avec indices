@@ -1,0 +1,87 @@
+#include<stdio.h>
+#define TAILLE 17 // Dimensions de la matrice (17x17)
+#define TAILLE_MAX 18 // pour afficher les lettres qui font les indices pour le joueur
+
+// Codes ANSI pour les couleurs
+#define RESET "\033[0m"   // Réinitialisation des styles
+#define FOND_CYAN "\033[46m" // Fond cyan
+#define FOND_NOIR "\033[40m"  // Fond noir
+#define FOND_BLANC "\033[47m" // Fond blanc
+#define FOND_VIOLET "\033[45m" // Fond violet
+#define TXT_BLEU "\033[34m" // Texte bleu
+
+/*
+ * Vérifie si une cellule appartient à l'un des 4 coins cyans de la matrice qui sont non affectables.
+ * Coins cyans :
+ * - Coin supérieur gauche (lignes 0-3, colonnes 0-3)
+ * - Coin inférieur gauche (lignes 13-17, colonnes 0-3)
+ * - Coin supérieur droit (lignes 0-3, colonnes 12-17)
+ * - Coin inférieur droit (lignes 12-17, colonnes 12-17)
+ */
+int Coin_Cyan(int i, int j) {
+    return (( i>= 0 && i <= 3 && j >= 0 && j <= 3) ||       // Coin supérieur gauche
+            (i >= 13 && i <= TAILLE && j >= 0 && j <= 3) ||    // Coin inférieur gauche
+            (i >= 0 && i <= 3 && j >= 13 && j <= TAILLE) ||    // Coin supérieur droit
+            (i >= 13 && i <= TAILLE && j >= 13 && j <= TAILLE));   // Coin inférieur droit
+}
+
+/*
+ * Affiche une cellule selon sa position :
+ * - Cyan si la cellule est dans un coin_cyan.
+ * - Alternance blanche/noire dans le reste de la matrice.
+ * - Affichage d'une ligne et colonne d'indice pour l'aide à la lecture des positions des cases pour le joueur
+ */
+void afficher_Cellule(int i, int j) {
+    if (j==17) {  //car on veut l'afficher sur la 17e colonne càd après le damier
+        while (i<17){
+            char LETTER = 'A' + i; /*permet de récuperer les lettres majuscules avec ASCII*/
+            printf("%s%c%s", TXT_BLEU ,LETTER, RESET); /* si on veut un texte bleu*/
+            //printf("%c",LETTER); /*si on veut neutre*/
+            //printf("%s%c%s", FOND_VIOLET ,LETTER, RESET); /* si on veut un fond violet*/
+            break;
+        }
+    }
+    else if (i==17) {   //car on veut l'afficher sur la 17e ligne, càd après le damier
+        char letter = 'a'+ j; /*permet de récuperer les lettres minuscules avec ASCII*/
+        printf("%s%c %s", TXT_BLEU,letter,RESET);  /* si on veut un texte bleu*/ 
+        //printf("%c ",letter); /*si on veut neutre*/ 
+        //printf("%s%c %s", FOND_VIOLET ,letter, RESET); /* si on veut un fond violet*/   
+    }
+    
+    else if (Coin_Cyan(i, j)) {
+        printf(FOND_CYAN "  " RESET); // Fond cyan
+    } 
+
+    else {
+        // Alternance : blanc si (ligne + colonne) est pair, noir sinon
+        if ((i + j) % 2 == 0) {
+            printf(FOND_BLANC "  " RESET);
+        }
+        else {
+            printf(FOND_NOIR "  " RESET);
+        }
+    }
+}
+
+
+/*
+Affiche la matrice complète avec un damier et des coins cyans pour les cases non affectables.
+ */
+void afficher_Matrice() {
+    for (int i = 0; i < TAILLE+1; i++) {
+        for (int j = 0; j < TAILLE+1; j++) {
+            afficher_Cellule(i, j);}
+        printf("\n"); // Saut de ligne après chaque rangée  
+    }
+}
+
+
+/*
+Point d'entrée principal.
+ */
+int main() {
+    printf("Matrice alternée (damier blanc/noir) avec coins cyans :\n\n");
+    afficher_Matrice();
+
+    return 0;
+}
