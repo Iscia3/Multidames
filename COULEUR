@@ -7,6 +7,7 @@
 #define FOND_CYAN "\033[46m" // Fond bleu cyan
 #define FOND_NOIR "\033[40m"  // Fond noir
 #define FOND_BLANC "\033[47m" // Fond blanc
+#define FOND_BLEU "\033[45m" // Fond blanc
 
 /**
  * Vérifie si une cellule appartient à l'un des 4 coins rouges de la matrice qui sont non affectables.
@@ -28,9 +29,32 @@ int Coin_Cyan(int i, int j) {
  * - Rouge si la cellule est dans un coin rouge.
  * - Alternance blanche/noire dans le reste de la matrice.
  */
+
+void afficher_chaine_sur_bande(const char* chaine, const char* couleur){
+    printf("%s%s%s\n",couleur,chaine, RESET);
+}
+
 void afficher_Cellule(int i, int j) {
-    if ((i==17 && 0<=j<=17) | (j==17 && 0<=i<=17))
-        printf(FOND_BLANC "  " RESET);
+
+    //char lettre=[A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
+    //int chiffres=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
+    int pos_tab=0;
+    char lettre[]="ABCDEFGHIJKLMNOPQR ";
+    int l;
+    char tab_alpha[17];
+    if (i==17) {
+           // afficher_chaine_sur_bande("ABCDEFGHIJKLMNOPQR",FOND_CYAN);
+       while (j<1)
+        {
+            afficher_chaine_sur_bande(" A B C D E F G H I J K L M N O P Q R",FOND_BLEU);
+            //printf(FOND_CYAN "  " RESET);
+            //printf("%c",lettre[j]);  
+            break;          
+        }    
+    }
+  //  else if  (j==17 && 0<=i<=17){
+    //}
+
 
     else if (Coin_Cyan(i, j)) {
         printf(FOND_CYAN "  " RESET); // Fond rouge
@@ -51,17 +75,14 @@ void afficher_Cellule(int i, int j) {
  */
 void afficher_Matrice() {
     char* lettre;
-    lettre=[A,B];
+    //lettre=[A,B];
     for (int i = 0; i < TAILLE+1; i++) {
         for (int j = 0; j < TAILLE+1; j++) {
-            afficher_Cellule(i, j);
-        }
+            afficher_Cellule(i, j);}
         printf("\n"); // Saut de ligne après chaque rangée
-        if (i==17){
-            for (j=0;j<=17;j++){
-                printf(" lettre[j] |");
-            }
-        }
+        
+            
+        
     }
 }
 
@@ -71,5 +92,6 @@ void afficher_Matrice() {
 int main() {
     printf("Matrice alternée (damier blanc/noir) avec coins rouges :\n\n");
     afficher_Matrice();
+
     return 0;
 }
