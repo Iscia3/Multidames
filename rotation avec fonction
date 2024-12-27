@@ -23,6 +23,10 @@ typedef enum {
 #define DAME_VERT 8
 #define CASE_VIDE 0
 #define CASE_NOIRE 9
+#define Bleu 10
+#define Rouge 11
+#define Jaune 12
+#define Vert 13
 
 // Dimensions du plateau
 #define TAILLE 17 // Le plateau est 17x17
@@ -296,13 +300,33 @@ void afficherDamier(Damier* jeu,Damier* temp) {
     }
 }
 
+void Rotation_Couleur(Damier* jeu, Damier* temp1, Damier* temp2,Damier* temp3,Couleur_joueur couleur){
+
+    switch (couleur) {
+            case Rouge:
+                afficher_Damier(jeu);
+                break;
+            case Jaune :
+                afficherDamier(rotationDamier(jeu,temp1),temp1);
+                break;
+            case Bleu:
+                afficherDamier(rotationDamier(rotationDamier(jeu,temp1),temp2),temp2);
+                break;
+            case Vert:
+                afficherDamier(rotationDamier(rotationDamier(rotationDamier(jeu,temp1),temp2),temp3),temp3);
+                break;
+            }
+}
+
 /*
  * Point d'entrée principal.
  */
 int main() {
     Damier jeu;
-    Damier temp;
+    Damier temp, temp1, temp2, temp3;
     Damier* T;
+    Damier* T1;
+    Damier* T2;
     Damier nouv;
 
     // Initialisation du damier
@@ -314,20 +338,31 @@ int main() {
     //afficher_etats_cases(& jeu); /* a mettre en commentaire, c'est pour voir ce que ca fait*/
    
 
-
+/*
     // Effectuer la rotation de 90°
     rotationDamier(&jeu,&temp);
 
     printf("\nDamier après rotation de 90° :\n");
     afficherDamier(&jeu, &temp);
+    */
 
+/*
     T= rotationDamier(&jeu, &temp);
-
     // Effectuer la rotation de 90°
     rotationDamier(T, &nouv);
-
-   // printf("\nDamier après rotation de 90° :\n");
-   afficherDamier(T,&nouv);
+    printf("\nDamier après rotation de 90° :\n");
+    afficherDamier(T,&nouv);
+    */
+    /*
+    printf("Entrer votre couleur (avec une majuscule au debut):");
+    char a;
+    scanf("%s", &a);
+    printf("\nDamier pour le %s :\n", &a);
+    printf("%s",&a);
+    Rotation_Couleur(&jeu, &temp1, &temp2, &temp3, a);
+    */
+    printf("\n exemple: Damier pour le joueur vert :\n");
+    Rotation_Couleur(&jeu, &temp1, &temp2, &temp3, Vert);
 
     return 0;
 }
