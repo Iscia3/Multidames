@@ -137,41 +137,6 @@ void effectuer_mouvement(Damier* jeu) {
 }
 
 
-/*
- * Effectue un déplacement s'il est valide.
- */
-bool deplacer_pion(int couleur, Deplacement d, Damier* jeu) {
-    // Vérifie la validité du déplacement
-    int resultat = verifier_deplacement(couleur, d, jeu);
-
-    if (resultat == -1) {
-        printf("Déplacement invalide.\n");
-        return false;
-    }
-
-    // Déplace le pion
-    jeu->index[d.case_i.lig][d.case_i.col] = CASE_VIDE;  // Vide la case de départ
-    jeu->index[d.case_f.lig][d.case_f.col] = couleur;    // Place le pion à la case d'arrivée
-
-    // Si c'est une prise, supprime le pion adverse
-    if (resultat == 1) {
-        int mid_lig = (d.case_i.lig + d.case_f.lig) / 2;
-        int mid_col = (d.case_i.col + d.case_f.col) / 2;
-        jeu->index[mid_lig][mid_col] = CASE_VIDE; // Vide la case intermédiaire
-    }
-
-    // Promotion en dame si le pion atteint la dernière rangée
-    if ((couleur == PION_BLEU && d.case_f.lig == 16) ||
-        (couleur == PION_ROUGE && d.case_f.lig == 0) ||
-        (couleur == PION_JAUNE && d.case_f.col == 0) ||
-        (couleur == PION_VERT && d.case_f.col == 16)) {
-        jeu->index[d.case_f.lig][d.case_f.col] = couleur + 1; // Promotion en dame
-        printf("Promotion en dame !\n");
-    }
-
-    return true;
-}
-
 int main() {
     Damier jeu = {{{LIBRE}}};
     effectuer_mouvement(&jeu);
