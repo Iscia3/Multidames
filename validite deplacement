@@ -1,0 +1,187 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h> // Pour utiliser le type bool
+
+// Dimensions du plateau
+#define TAILLE 17 // Le plateau est 17x17
+
+typedef enum {
+    LIBRE, 
+    OCCUPEE, 
+    NON_AFFECTABLE
+} EtatCase;
+
+typedef enum{
+    AvG,
+    AvD,
+    PriseAvG,
+    PriseAvD,
+    PriseArG,
+    PriseArD,
+    ArG,
+    ArD,
+    Aucun
+} Mouvement;
+
+// Structure du plateau de jeu
+typedef struct {
+    int index[TAILLE][TAILLE]; // État du plateau
+    //int temp[TAILLE][TAILLE];
+    int nb_bleu, nb_rouge, nb_jaune, nb_vert; // Nombre de pions pour chaque couleur
+} Damier;
+
+typedef struct {
+    int i; // Ligne
+    int j; // Colonne
+} Case;
+
+// Vérification des mouvements
+bool verifier_mouvement(Case case_debut, Case case_fin, Mouvement* mouv, bool* prise, Damier* jeu) {
+    // Initialiser les valeurs de sortie
+    *mouv = Aucun;
+    *prise = false;
+
+    // Calcul des différences entre les indices des cases
+    int di = case_fin.i - case_debut.i;
+    int dj = case_fin.j - case_debut.j;
+
+    // Vérification des différents types de mouvements
+    if (di == 1 && dj == -1) {
+        *mouv = AvG;  // Avant Gauche
+    } else if (di == 1 && dj == 1) {
+        *mouv = AvD;  // Avant Droite
+    } else if (di == 2 && dj == -2) {
+        // Vérifier la case intermédiaire pour une prise Avant Gauche
+        if (jeu->index[case_debut.i + 1][case_debut.j - 1] == OCCUPEE) {
+            *mouv = PriseAvG;
+            *prise = true;
+        }
+    } else if (di == 2 && dj == 2) {
+        // Vérifier la case intermédiaire pour une prise Avant Droite
+        if (jeu->index[case_debut.i + 1][case_debut.j + 1] == OCCUPEE) {
+            *mouv = PriseAvD;
+            *prise = true;
+        }
+    } else if (di == -1 && dj == -1) {
+        *mouv = ArG;  // Arrière Gauche
+    } else if (di == -1 && dj == 1) {
+        *mouv = ArD;  // Arrière Droite
+    } else if (di == -2 && dj == -2) {
+        // Vérifier la case intermédiaire pour une prise Arrière Gauche
+        if (jeu->index[case_debut.i - 1][case_debut.j - 1] == OCCUPEE) {
+            *mouv = PriseArG;
+            *prise = true;
+        }
+    } else if (di == -2 && dj == 2) {
+        // Vérifier la case intermédiaire pour une prise Arrière Droite
+        if (jeu->index[case_debut.i - 1][case_debut.j + 1] == OCCUPEE) {
+            *mouv = PriseArD;
+            *prise = true;
+        }
+    }
+
+    // Vérifier si la case d'arrivée est valide pour le mouvement
+    if (*mouv != Aucun && jeu->index[case_fin.i][case_fin.j] == LIBRE) {
+        return true;
+    }
+
+    // Si aucune condition valide n'est remplie, le mouvement est invalide
+    return false;
+}
+
+// Fonction principale pour gérer un mouvement
+void effectuer_mouvement(Damier* jeu) {
+    Case case_debut, case_fin;
+    Mouvement mouv;
+    bool prise;
+    char commentaire[256];
+
+    printf("Entrez la case de départ (i j) : ");
+    scanf("%d %d", &case_debut.i, &case_debut.j);
+
+    printf("Entrez la case de fin (i j) : ");
+    scanf("%d %d", &case_fin.i, &case_fin.j);
+
+    if (verifier_mouvement(case_debut, case_fin, &mouv, &prise, jeu)) {
+        printf("Mouvement valide : ");
+
+        // Affichage du type de mouvement
+        switch (mouv) {
+            case AvG: printf("Avant Gauche\n"); break;
+            case AvD: printf("Avant Droite\n"); break;
+            case PriseAvG: printf("Prise Avant Gauche\n"); break;
+            case PriseAvD: printf("Prise Avant Droite\n"); break;
+            case PriseArG: printf("Prise Arrière Gauche\n"); break;
+            case PriseArD: printf("Prise Arrière Droite\n"); break;
+            case ArG: printf("Arrière Gauche\n"); break;
+            case ArD: printf("Arrière Droite\n"); break;
+            default: break;
+        }
+
+        printf("Prise : %s\n", prise ? "Oui" : "Non");
+
+        // Mettre à jour le damier
+        jeu->index[case_debut.i][case_debut.j] = LIBRE;
+        jeu->index[case_fin.i][case_fin.j] = OCCUPEE;
+        if (prise) {
+            jeu->index[(case_debut.i + case_fin.i) / 2][(case_debut.j + case_fin.j) / 2] = LIBRE;
+        }
+
+        // Commentaire facultatif
+        printf("Entrez un commentaire pour ce mouvement : ");
+        scanf(" %[^\n]", commentaire);
+        printf("Commentaire : %s\n", commentaire);
+    } else {
+        printf("Mouvement invalide.\n");
+    }
+}
+
+
+/*
+ * Effectue un déplacement s'il est valide.
+ */
+bool deplacer_pion(int couleur, Deplacement d, Damier* jeu) {
+    // Vérifie la validité du déplacement
+    int resultat = verifier_deplacement(couleur, d, jeu);
+
+    if (resultat == -1) {
+        printf("Déplacement invalide.\n");
+        return false;
+    }
+
+    // Déplace le pion
+    jeu->index[d.case_i.lig][d.case_i.col] = CASE_VIDE;  // Vide la case de départ
+    jeu->index[d.case_f.lig][d.case_f.col] = couleur;    // Place le pion à la case d'arrivée
+
+    // Si c'est une prise, supprime le pion adverse
+    if (resultat == 1) {
+        int mid_lig = (d.case_i.lig + d.case_f.lig) / 2;
+        int mid_col = (d.case_i.col + d.case_f.col) / 2;
+        jeu->index[mid_lig][mid_col] = CASE_VIDE; // Vide la case intermédiaire
+    }
+
+    // Promotion en dame si le pion atteint la dernière rangée
+    if ((couleur == PION_BLEU && d.case_f.lig == 16) ||
+        (couleur == PION_ROUGE && d.case_f.lig == 0) ||
+        (couleur == PION_JAUNE && d.case_f.col == 0) ||
+        (couleur == PION_VERT && d.case_f.col == 16)) {
+        jeu->index[d.case_f.lig][d.case_f.col] = couleur + 1; // Promotion en dame
+        printf("Promotion en dame !\n");
+    }
+
+    return true;
+}
+
+int main() {
+    Damier jeu = {{{LIBRE}}};
+    effectuer_mouvement(&jeu);
+    return 0;
+}
+/* Ce que ça pourait donner:
+Entrez la case de départ (i j) : 5 2
+Entrez la case de fin (i j) : 6 3
+Mouvement valide : Avant Droite
+Prise : Non
+Entrez un commentaire pour ce mouvement : Coup offensif pour bloquer l'adversaire.
+Commentaire : Coup offensif pour bloquer l'adversaire.
+*/
