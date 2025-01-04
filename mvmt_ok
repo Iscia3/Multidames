@@ -11,7 +11,7 @@
 #define DAME_JAUNE 6
 #define PION_VERT 7
 #define DAME_VERT 8
-#define CASE_VIDE 0
+#define CASE_VIDE 9
 
 // Dimensions du plateau
 #define TAILLE 17 // Le plateau est 17x17
@@ -68,10 +68,11 @@ typedef struct {
 
 // Joueur
 typedef enum {
-    Rouge,
-    Vert,
+    Noire,
     Bleu,
-    Jaune    
+    Rouge,
+    Jaune,
+    Vert    
 } Couleur_joueur;
 
 
@@ -203,82 +204,158 @@ int couleur_de_case(Damier* jeu, int x, int y){ // x depart, y arrivee
 
 Damier* mvt(Damier* jeu, Couleur_joueur couleur){
     Case case_debut, case_fin;
-
-    printf("Entrez la case de départ (i j) : ");
+    Damier jeux;
+    Damier* nb_bleu,nb_vert,nb_jaune,nb_rouge;
+    int reponse;
+    int pas_fini;
+    pas_fini=1;
+    do
+    {
+        printf("Entrez la case de départ (i j) : ");
     scanf("%d %d", &case_debut.i, &case_debut.j);
 
     printf("Entrez la case de fin (i j) : ");
     scanf("%d %d", &case_fin.i, &case_fin.j);
+
     case_debut.j=case_debut.j+1;
     case_fin.j=case_fin.j+1;
-    printf("%d",case_fin.j);
-    printf("%d",case_debut.j);
+    //printf("%d",case_fin.j);
+    //printf("%d",case_debut.j);
+    //printf("case arri %d", jeu->index[case_debut.i][case_debut.j]);
 
-    if (jeu->index[case_debut.i][case_debut.j] == LIBRE)
+    //&& jeu->index[case_debut.i][case_debut.j]== couleur_de_case(jeu,case_debut.i,case_debut.j)
+    if (jeu->index[case_fin.i][case_fin.j] == CASE_VIDE && jeu->index[case_debut.i][case_debut.j]== couleur_de_case(jeu,case_debut.i,case_debut.j) )
     {
+        //printf("couleur %d",jeu->index[case_debut.i][case_debut.j]);
         case_debut.j=case_debut.j-1;
         case_fin.j=case_fin.j-1;
-        printf("ok");
-        int chiffre1=abs(case_debut.j- case_debut.i);
-        int chiffre2=abs(case_fin.j- case_fin.i);
-        printf("%d %d",chiffre1,chiffre2);
-        if (abs(case_debut.j- case_debut.i)==abs(case_fin.j- case_fin.i)){
+        //printf("ok");
+        int chiffre1=abs(case_fin.j- case_debut.j);
+        int chiffre2=abs(case_fin.i- case_debut.i);
+        //printf("%d %d",chiffre1,chiffre2);
+        if (abs(case_fin.j- case_debut.j)==abs(case_fin.i- case_debut.i)){
             printf("okk");
-            if(abs(case_debut.j- case_debut.i)==1){ //mvmt simple
-                printf("okkk");
+            if(abs(case_fin.j- case_debut.j)==1){ //mvmt simple
+                //printf("okkk");
+                //printf("%d", couleur);
                 switch (couleur) {
                     case Rouge:
-                        if (case_debut.j- case_debut.i==-1){
-                            printf("Mouvement valide\n");
-                            jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
-                            jeu->index[case_fin.i][case_fin.j] = couleur-1;    // Place le pion à la case d'arrivée
+                        if (case_fin.j- case_debut.j==1){
+                            if (jeu->index[case_debut.i][case_debut.j]==PION_ROUGE){
+                                printf("Mouvement valide\n");
+                                jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
+                                jeu->index[case_fin.i][case_fin.j] =OCCUPEE;
+                                jeu->index[case_fin.i][case_fin.j] = couleur+1;  // Place le pion à la case d'arrivée
+                                //il faut mettre couleur+2 si c'est une dame
+                                pas_fini=0; /*on met la variable à zero, comme ca la boucle while se termine (car un seul coup simple autorisé)*/
+                            }
                         }
                         break;
                     case Jaune:
-                        if (case_debut.j- case_debut.i==1){
-                            printf("Mouvement valide\n");
-                            jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
-                            jeu->index[case_fin.i][case_fin.j] = couleur-1;    // Place le pion à la case d'arrivée
+                        if (case_fin.j- case_debut.j==-1){
+                            if (jeu->index[case_debut.i][case_debut.j]==PION_JAUNE){
+                                printf("Mouvement valide\n");
+                                jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
+                                jeu->index[case_fin.i][case_fin.j]=OCCUPEE;
+                                jeu->index[case_fin.i][case_fin.j] = couleur+2;   // Place le pion à la case d'arrivée 
+                                //couleur+2 car c'est la couleur joueur mais aussi ici ceux definis dans define, donc sans +2 cela donne une dame bleue
+                                //couleur+3 si c'est une dame
+                                pas_fini=0;
+                            }
                         }
                         break;
                     case Bleu:
                         printf("%d",case_fin.j);
                         printf("%d",case_fin.i);
-                        if (case_fin.j- case_fin.i==1){
-                            printf("Mouvement valide\n");
-                            jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
-                            jeu->index[case_fin.i][case_fin.j] = couleur-1;    // Place le pion à la case d'arrivée
+                        if (case_fin.i- case_debut.i==1){
+                            if (jeu->index[case_debut.i][case_debut.j]==PION_BLEU){
+                                printf("Mouvement valide1\n");
+                                jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
+                                jeu->index[case_fin.i][case_fin.j]=OCCUPEE;
+                                jeu->index[case_fin.i][case_fin.j] = couleur;    // Place le pion à la case d'arrivée
+                                pas_fini=0;
+                            }
                         }
                         break;
                     case Vert:
-                        if (case_fin.j- case_fin.i==1){
+                        if (case_fin.i- case_debut.i==1){
+                           // if (jeu->index[case_debut.i][case_debut.j]==PION_VERT){
                             printf("Mouvement valide\n");
                             jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
-                            jeu->index[case_fin.i][case_fin.j] = couleur-1;    // Place le pion à la case d'arrivée
+                            jeu->index[case_fin.i][case_fin.j] =OCCUPEE;
+                            jeu->index[case_fin.i][case_fin.j] = couleur+3;    // Place le pion à la case d'arrivée
+                            pas_fini=0;
+                           // }
                         }
                         break;
                     default: 
                         printf("Mouvement est invalide.\n");
+                        pas_fini=0;
             }}
             else{
-                if(abs(case_debut.j- case_debut.i)==3){ //mvmt avec saut {
+                if(abs(case_fin.j- case_debut.j)==3){ //mvmt avec saut {
                     printf("Mouvement valide");
                     Case case_intermediaire;
-                    case_intermediaire.i=(case_debut.j - case_debut.i)/2+case_debut.j;
-                    case_intermediaire.j=(case_fin.j - case_fin.i)/2 + case_fin.j;
+                    case_intermediaire.i=(case_fin.j - case_debut.j)/2+case_fin.j;
+                    case_intermediaire.j=(case_fin.i - case_debut.i)/2 + case_fin.i;
                     if (jeu-> index[case_intermediaire.i][case_intermediaire.j]==OCCUPEE){
                         if (couleur=!couleur_de_case(jeu,case_intermediaire.i,case_intermediaire.j)){
                             jeu->index[case_debut.i][case_debut.j] = CASE_VIDE;  // Vide la case de départ
-                            jeu->index[case_intermediaire.i+1][case_intermediaire.j+1] = OCCUPEE;  // Vide la case de départ
-                            jeu->index[case_fin.i][case_fin.j] = couleur;    // Place le pion à la case d'arrivée
+                            jeu->index[case_intermediaire.i][case_intermediaire.j] = CASE_VIDE;  // Vide la case intermediaire
+                            jeu->index[case_fin.i][case_fin.j]=OCCUPEE;
+                            switch(couleur){
+                            case Rouge: 
+                                jeu->index[case_fin.i][case_fin.j] = couleur+1;    // Place le pion à la case d'arrivée
+                            case Jaune: 
+                                jeu->index[case_fin.i][case_fin.j] = couleur+2;    // Place le pion à la case d'arrivée
+                            case Bleu: 
+                                jeu->index[case_fin.i][case_fin.j] = couleur;    // Place le pion à la case d'arrivée
+                            case Vert: 
+                                jeu->index[case_fin.i][case_fin.j] = couleur+3;    // Place le pion à la case d'arrivée
+                            }
+                            
+                            //jeux=*jeu;
+                            //switch(jeu->index[case_intermediaire.i+1][case_intermediaire.j+1])
+                            //afficher_Damier(jeux);  
+                            switch(jeu->index[case_intermediaire.i][case_intermediaire.j]){
+                                case PION_BLEU:
+                                    jeu->nb_bleu=jeu->nb_bleu-1;
+                                    break;
+                                case PION_ROUGE:
+                                    jeu->nb_rouge=jeu->nb_rouge-1;
+                                    break;
+                                case PION_JAUNE:
+                                    jeu->nb_jaune=jeu->nb_jaune-1;
+                                    break;
+                                case PION_VERT:
+                                    jeu->nb_vert=jeu->nb_vert-1;
+                                    break;
+                                case DAME_BLEU:   
+                                    jeu->nb_bleu=jeu->nb_bleu-2; //on considere qu'une dame vaut 2 danss le compte de pions
+                                    break;
+                                case DAME_ROUGE:
+                                    jeu->nb_rouge=jeu->nb_rouge-2;
+                                    break;
+                                case DAME_JAUNE:
+                                    jeu->nb_jaune=jeu->nb_jaune-2;
+                                    break;
+                                case DAME_VERT:
+                                    jeu->nb_vert=jeu->nb_vert-2;
+                                    break;
+                            }    
+                            printf("Continuer le coup ? (0:non, 1:oui");
+                            scanf("%d",&reponse);
+                            pas_fini=reponse;         
                         
                         }
                         else{
                             printf("Mouvement invalide.\n");
+                            pas_fini=0;
                         }
                     }
                     else{
                         printf("Mouvement invalide.\n");
+                        pas_fini=0;
                     }
                 }
                 //printf("Mouvement invalide\n");
@@ -288,16 +365,24 @@ Damier* mvt(Damier* jeu, Couleur_joueur couleur){
     }
     else {
         printf("mouvement interdit.\n");
-    }
+        pas_fini=0;
+    }}while (pas_fini==1);
+    
+
     return jeu;
 }
+
 int main(){
     Damier jeu;
     Damier* jeux;
     init_damier(&jeu);
     afficher_Damier(&jeu);
-    jeux=mvt(&jeu,Bleu);
-    afficher_Damier(jeux);
-    afficher_Damier(&jeu);
+    //mvt(&jeu, Rouge);
+    //jeux=mvt(&jeu,Vert);
+    //jeu=*jeux;
+    //afficher_Damier(&jeu);
+    //afficher_Damier(mvt(&jeu,Bleu));
+    //afficher_etats_cases(&jeu);
+    total(&jeu);
     return 0;
-}d
+}
