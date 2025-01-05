@@ -305,14 +305,14 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
             case Jaune: 
                 printf("    "); 
                 for (int j = 0; j < TAILLE; j++) { // indices colonnes
-                    printf(TXT_BLEU "%c  "RESET, 'A'+ j);
+                    printf(TXT_BLEU "%c  "RESET, 'q'+ j);
         
                     }
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
                     // Affiche les indices des lignes (A à Q) à gauche
-                    printf(TXT_BLEU " %c "RESET, 'q' - i);
+                    printf(TXT_BLEU " %c "RESET, 'A' + i);
                     for (int j = 0; j < TAILLE; j++) {
                         afficher_Cellule(i, j, temp->index);
                      }
@@ -322,14 +322,14 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
             case Bleu:
                 printf("    "); 
                 for (int j = 0; j < TAILLE; j++) {
-                    printf(TXT_BLEU "%c  "RESET, 'q'- j);
+                    printf(TXT_BLEU "%c  "RESET, 'Q'- j);
         
                     }
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
-                    // Affiche les indices des lignes (A à Q) à gauche
-                    printf(TXT_BLEU " %c "RESET, 'Q' - i);
+                    // Affiche les indices des lignes à gauche
+                    printf(TXT_BLEU " %c "RESET, 'q' - i);
                     for (int j = 0; j < TAILLE; j++) {
                         afficher_Cellule(i, j, temp->index);
                      }
@@ -339,14 +339,14 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
             case Vert:
                 printf("    "); 
                 for (int j = 0; j < TAILLE; j++) {
-                    printf(TXT_BLEU "%c  "RESET, 'Q'- j);
+                    printf(TXT_BLEU "%c  "RESET, 'a'+ j);
         
                     }
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
                     // Affiche les indices des lignes (A à Q) à gauche
-                    printf(TXT_BLEU " %c "RESET, 'a' + i);
+                    printf(TXT_BLEU " %c "RESET, 'Q' - i);
                     for (int j = 0; j < TAILLE; j++) {
                         afficher_Cellule(i, j, temp->index);
                      }
