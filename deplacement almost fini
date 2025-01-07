@@ -510,6 +510,7 @@ Damier* rotationDamier(Damier* jeu,Damier* temp) {
     }
     return(temp);
 }
+
 /* 
 Fonction pour afficher le damier avec une rotation des indices
 */
@@ -518,8 +519,8 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
     switch(couleur){
             case Rouge: 
                 printf("    "); 
+                //affiche les indices des colonnes (1 à 16) en haut 
                 for (int j = 0; j < TAILLE; j++) {
-                    //printf(TXT_BLEU "%c "RESET, 'a'+ j);
                     if (j<=9){
                         printf(TXT_BLEU "%d  "RESET, j);
                     }
@@ -529,7 +530,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
-                // Affiche les indices des lignes (A à Q) à gauche
+                // Affiche les indices des lignes (1 à 16) à gauche
                     //printf(TXT_BLEU " %d "RESET, i);
                     if (i<=9){
                         printf(TXT_BLEU " %d "RESET, i);
@@ -547,7 +548,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
 
             case Jaune: 
                 printf("   "); 
-                for (int j = 0; j < TAILLE; j++) { // indices colonnes
+                for (int j = 0; j < TAILLE; j++) { // indices colonnes (16 à 1) en haut
                     //printf(TXT_BLEU "%d "RESET,j);
                     if (j<7){
                         printf(TXT_BLEU "%d "RESET, 16-j);
@@ -562,7 +563,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
-                    // Affiche les indices des lignes (A à Q) à gauche
+                    // Affiche les indices des lignes (1 à 16) à gauche
                     //printf(TXT_BLEU " %d "RESET,i);
                     if (i<=9){
                         printf(TXT_BLEU " %d "RESET, i);
@@ -578,6 +579,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 }
                 break;
             case Bleu:
+                //affiche les indices des colonnes (16 à 1) en haut
                 printf("   "); 
                 for (int j = 0; j < TAILLE; j++) {
                     if (j<7){
@@ -591,7 +593,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
-                    // Affiche les indices des lignes (A à Q) à gauche
+                    // Affiche les indices des lignes (16 à 1) à gauche
                     //printf(TXT_BLEU " %d "RESET, i);
                     if (i<7){
                         printf(TXT_BLEU "%d "RESET, 16-i);
@@ -607,6 +609,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 break;
             case Vert:
                 printf("    "); 
+                //affiche les indices des lignes (1 à 16) en haut
                 for (int j = 0; j < TAILLE; j++) {
                     if (j<=9){
                         printf(TXT_BLEU " %d "RESET, j);
@@ -618,7 +621,7 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
                 printf("\n");
 
                 for (int i = 0; i < TAILLE; i++) {
-                    // Affiche les indices des lignes (A à Q) à gauche
+                    // Affiche les indices des lignes (16 à 1) à gauche
                     //printf(TXT_BLEU " %d "RESET, i);
                     if (i<7){
                         printf(TXT_BLEU "%d "RESET, 16-i);
