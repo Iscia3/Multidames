@@ -341,8 +341,6 @@ Damier* mvt(Damier* jeu, Couleur_joueur couleur){
                         
                     case Jaune:
                         if (abs(case_fin.j- case_debut.j)==1){
-                            printf("%d",jeu->index[case_debut.j][case_debut.i]);
-                            printf("%d", PION_JAUNE);
                             if (jeu->index[case_debut.j][case_debut.i]==PION_JAUNE){
                             printf("Mouvement valide\n");
                             jeu->index[case_debut.j][case_debut.i] = CASE_VIDE;  // Vide la case de départ
