@@ -1,0 +1,425 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Joueur
+typedef enum {
+    Rouge,
+    Vert,
+    Bleu,
+    Jaune    
+} Couleur_joueur;
+
+
+
+// Définition des constantes pour les types de pions et les couleurs
+#define PION_BLEU 1
+#define DAME_BLEU 2
+#define PION_ROUGE 3
+#define DAME_ROUGE 4
+#define PION_JAUNE 5
+#define DAME_JAUNE 6
+#define PION_VERT 7
+#define DAME_VERT 8
+#define CASE_VIDE 0
+#define CASE_NOIRE 9
+#define Bleu 10
+#define Rouge 11
+#define Jaune 12
+#define Vert 13
+
+// Dimensions du plateau
+#define TAILLE 17 // Le plateau est 17x17
+
+// Codes ANSI pour les couleurs
+#define RESET "\033[0m"   // Réinitialisation des styles
+#define FOND_CYAN "\033[46m" // Fond cyan
+#define FOND_NOIR "\033[40m"  // Fond noir
+#define FOND_BLANC "\033[47m" // Fond blanc
+#define TXT_BLEU "\033[34m"   // Texte bleu
+
+// Structure du plateau de jeu
+typedef struct {
+    int index[TAILLE][TAILLE]; // État du plateau
+    //int temp[TAILLE][TAILLE];
+    int nb_bleu, nb_rouge, nb_jaune, nb_vert; // Nombre de pions pour chaque couleur
+} Damier;
+
+//Damier* jeu;
+//Damier* temp;
+/*
+typedef enum {
+    CASE_VIDE,
+    PION_BLEU,
+    DAME_BLEU,
+    PION_ROUGE,
+    DAME_ROUGE,
+    PION_JAUNE,
+    DAME_JAUNE,
+    PION_VERT,
+    DAME_VERT,
+    CASE_NOIRE,    
+} Couleur;
+*/
+typedef enum {
+    LIBRE,        // Case vide et utilisable
+    OCCUPEE,      // Case occupée par un pion
+    NON_AFFECTABLE // Case non jouable (par exemple, hors des zones jouables)
+} EtatCase;
+
+/*
+ * Vérifie si une cellule appartient à l'un des 4 coins cyans de la matrice qui sont non affectables.
+ */
+int Coin_Cyan(int i, int j) {
+    return ((i >= 0 && i < 4 && j >= 0 && j < 4) ||       // Coin supérieur gauche
+            (i >= 13 && i < TAILLE && j >= 0 && j < 4) || // Coin inférieur gauche
+            (i >= 0 && i < 4 && j >= 13 && j < TAILLE) || // Coin supérieur droit
+            (i >= 13 && i < TAILLE && j >= 13 && j < TAILLE)); // Coin inférieur droit
+}
+
+/*
+ * Initialise le damier avec les pions dans les positions de départ.
+ */
+void init_damier(Damier* jeu) {
+    // Initialisation des nombres de pions
+    jeu->nb_bleu = 22;
+    jeu->nb_rouge = 22;
+    jeu->nb_jaune = 22;
+    jeu->nb_vert = 22;
+
+    // Initialisation du tableau
+    for (int i = 0; i < TAILLE; i++) {
+        for (int j = 0; j < TAILLE; j++) {
+            jeu->index[i][j] = CASE_VIDE;
+        }
+    }
+    for (int i = 0; i < TAILLE; i++) {
+        for (int j = 0; j < TAILLE; j++) {
+            if (i+j%2==1)
+            jeu->index[i][j] = CASE_NOIRE;
+        }
+    }
+
+    // Placement des pions bleus (haut)
+    for (int i = 0; i < 5; i++) {
+        for (int j = 4; j < 13; j++) {
+            if ((i + j) % 2 == 1) { // Cases noires seulement
+                jeu->index[i][j] = PION_BLEU;
+            }
+        }
+    }
+
+    // Placement des pions rouges (bas)
+    for (int i = 12; i < 17; i++) {
+        for (int j = 4; j < 13; j++) {
+            if ((i + j) % 2 == 1) { // Cases noires seulement
+                jeu->index[i][j] = PION_ROUGE;
+            }
+        }
+    }
+
+    // Placement des pions jaunes (droite)
+    for (int i = 4; i < 13; i++) {
+        for (int j = 12; j < TAILLE; j++) {
+            if ((i + j) % 2 == 1) { // Cases noires seulement
+                jeu->index[i][j] = PION_JAUNE;
+            }
+        }
+    }
+
+    // Placement des pions verts (gauche)
+    for (int i = 4; i < 13; i++) {
+        for (int j = 0; j < 5; j++) {
+            if ((i + j) % 2 == 1) { // Cases noires seulement
+                jeu->index[i][j] = PION_VERT;
+            }
+        }
+    }
+}
+
+/*
+ * Affiche une cellule selon son état dans le damier.
+ */
+void afficher_Cellule(int i, int j, int index[TAILLE][TAILLE]) {
+    if (Coin_Cyan(i, j)) {
+        printf(FOND_CYAN "   " RESET); // Fond cyan sans traits noirs
+    } else {
+        switch (index[i][j]) {
+            case PION_BLEU:
+                printf(FOND_NOIR TXT_BLEU " ● " RESET);
+                break;
+            case DAME_BLEU:
+                printf(FOND_NOIR TXT_BLEU "[O]" RESET);
+                break;
+            case PION_ROUGE:
+                printf(FOND_NOIR "\033[31m ● " RESET); // Rouge
+                break;
+            case DAME_ROUGE:
+                printf(FOND_NOIR "\033[31m[O]" RESET);
+                break;
+            case PION_JAUNE:
+                printf(FOND_NOIR "\033[33m ● " RESET); // Jaune
+                break;
+            case DAME_JAUNE:
+                printf(FOND_NOIR "\033[33m[O]" RESET);
+                break;
+            case PION_VERT:
+                printf(FOND_NOIR "\033[32m ● " RESET); // Vert
+                break;
+            case DAME_VERT:
+                printf(FOND_NOIR "\033[32m[O]" RESET);
+                break;
+            case CASE_VIDE:
+                // Alternance blanc/noir pour les cases vides
+                if ((i + j) % 2 == 0) {
+                    printf(FOND_BLANC "   " RESET);
+                } else {
+                    printf(FOND_NOIR "   " RESET);
+                }
+                break;
+            default:
+                printf(" ? "); // Cas invalide
+                break;
+        }
+    }
+}
+
+/*
+ * Affiche le damier complet avec les indices en haut et à gauche.
+ */
+void afficher_Damier(Damier* jeu) {
+    // Affiche les indices des colonnes (a à q) en haut
+    printf("    "); 
+    for (int j = 0; j < TAILLE; j++) {
+        printf(TXT_BLEU "%c  "RESET, 'A'+ j);
+        
+    }
+    printf("\n");
+
+    for (int i = 0; i < TAILLE; i++) {
+        // Affiche les indices des lignes (A à Q) à gauche
+        printf(TXT_BLEU " %c "RESET, 'a'+ i);
+        for (int j = 0; j < TAILLE; j++) {
+            afficher_Cellule(i, j, jeu->index);
+        }
+        printf("\n");
+    }
+}
+
+// Fonction pour déterminer l'état d'une case
+EtatCase etat_case(int i, int j,Damier* jeu) {
+    if (Coin_Cyan(i, j)) {
+        return NON_AFFECTABLE; // Cases des coins cyan
+    }
+
+    switch (jeu->index[i][j]) {
+        case CASE_VIDE :
+            if ((i+j)%2==1)
+                return LIBRE;
+            else{return NON_AFFECTABLE;}
+        case PION_BLEU:
+        case DAME_BLEU:
+        case PION_ROUGE:
+        case DAME_ROUGE:
+        case PION_JAUNE:
+        case DAME_JAUNE:
+        case PION_VERT:
+        case DAME_VERT:
+            return OCCUPEE;
+        default:
+            return NON_AFFECTABLE; // Cas inattendu
+    }
+}
+
+// Une fois dans le damier
+void afficher_etats_cases(Damier* jeu) {
+    printf("États des cases :\n\n");
+    for (int i = 0; i < TAILLE; i++) {
+        for (int j = 0; j < TAILLE; j++) {
+            EtatCase etat = etat_case(i, j,jeu);
+            switch (etat) {
+                case LIBRE:
+                    printf(" L ");
+                    break;
+                case OCCUPEE:
+                    printf(" O ");
+                    break;
+                case NON_AFFECTABLE:
+                    printf(" N ");
+                    break;
+            }
+
+        }
+        printf("\n");
+    }
+}
+
+/*void rotation(Damier* jeu,Couleur_joueur joueur){
+    switch (jeu->Couleur_joueur) {
+        case Bleu :
+
+
+        case Rouge:
+        case Vert:
+        case Jaune:
+
+    
+}*/
+
+
+Damier* rotationDamier(Damier* jeu,Damier* temp) {
+    // Rotation de 90° dans le sens des aiguilles d'une montre
+    
+
+    // Remplir la matrice temporaire avec les éléments de la matrice originale
+    for (int i = 0; i < TAILLE; i++) {
+        for (int j = 0; j < TAILLE; j++) {
+            //int index[i][j];
+            temp->index[j][TAILLE-i-1]=jeu->index[i][j];
+        }
+    }
+    return(temp);
+}
+
+void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
+    // Affiche les indices des colonnes (A à Q) en haut
+    switch(couleur){
+            case Rouge: 
+                printf("    "); 
+                for (int j = 0; j < TAILLE; j++) {
+                    printf(TXT_BLEU "%c  "RESET, 'A'+ j);
+          
+                      }
+                printf("\n");
+
+                for (int i = 0; i < TAILLE; i++) {
+                // Affiche les indices des lignes (a à q) à gauche
+                    printf(TXT_BLEU " %c "RESET, 'a' + i);
+                    for (int j = 0; j < TAILLE; j++) {
+                        afficher_Cellule(i, j, temp->index);
+                     }
+                    printf("\n");
+                 }
+                break;
+
+            case Jaune: 
+                printf("    "); 
+                for (int j = 0; j < TAILLE; j++) { // indices colonnes
+                    printf(TXT_BLEU "%c  "RESET, 'q'- j);
+        
+                    }
+                printf("\n");
+
+                for (int i = 0; i < TAILLE; i++) {
+                    // Affiche les indices des lignes (A à Q) à gauche
+                    printf(TXT_BLEU " %c "RESET, 'A' + i);
+                    for (int j = 0; j < TAILLE; j++) {
+                        afficher_Cellule(i, j, temp->index);
+                     }
+                    printf("\n");
+                }
+                break;
+            case Bleu:
+                printf("    "); 
+                for (int j = 0; j < TAILLE; j++) {
+                    printf(TXT_BLEU "%c  "RESET, 'Q'- j);
+        
+                    }
+                printf("\n");
+
+                for (int i = 0; i < TAILLE; i++) {
+                    // Affiche les indices des lignes (A à Q) à gauche
+                    printf(TXT_BLEU " %c "RESET, 'q' - i);
+                    for (int j = 0; j < TAILLE; j++) {
+                        afficher_Cellule(i, j, temp->index);
+                     }
+                    printf("\n");
+                }
+                break;
+            case Vert:
+                printf("    "); 
+                for (int j = 0; j < TAILLE; j++) {
+                    printf(TXT_BLEU "%c  "RESET, 'a'+ j);
+        
+                    }
+                printf("\n");
+
+                for (int i = 0; i < TAILLE; i++) {
+                    // Affiche les indices des lignes (A à Q) à gauche
+                    printf(TXT_BLEU " %c "RESET, 'Q' - i);
+                    for (int j = 0; j < TAILLE; j++) {
+                        afficher_Cellule(i, j, temp->index);
+                     }
+                    printf("\n");
+                }
+                break;
+            
+    }
+}
+
+void Rotation_Couleur(Damier* jeu, Damier* temp1, Damier* temp2,Damier* temp3,Couleur_joueur couleur){
+
+    switch (couleur) {
+            case Rouge:
+                afficher_Damier(jeu);
+                break;
+            case Jaune :
+                afficherDamier(rotationDamier(jeu,temp1),temp1,couleur);
+                break;
+            case Bleu:
+                afficherDamier(rotationDamier(rotationDamier(jeu,temp1),temp2),temp2,couleur);
+                break;
+            case Vert:
+                afficherDamier(rotationDamier(rotationDamier(rotationDamier(jeu,temp1),temp2),temp3),temp3,couleur);
+                break;
+            }
+}
+
+/*
+ * Point d'entrée principal.
+ */
+int main() {
+    Damier jeu;
+    Damier temp, temp1, temp2, temp3;
+    Damier* T;
+    Damier* T1;
+    Damier* T2;
+    Damier nouv;
+
+    // Initialisation du damier
+    init_damier(&jeu);
+
+    // Affichage du damier avec ses couleurs
+    printf("Damier avec pions et couleurs :\n\n");
+    afficher_Damier(&jeu);
+    //afficherDamier(&jeu,&temp,Rouge);
+    //afficher_etats_cases(& jeu); /* a mettre en commentaire, c'est pour voir ce que ca fait*/
+   
+
+/*
+    // Effectuer la rotation de 90°
+    rotationDamier(&jeu,&temp);
+
+    printf("\nDamier après rotation de 90° :\n");
+    afficherDamier(&jeu, &temp);
+    */
+
+/*
+    T= rotationDamier(&jeu, &temp);
+    // Effectuer la rotation de 90°
+    rotationDamier(T, &nouv);
+    printf("\nDamier après rotation de 90° :\n");
+    afficherDamier(T,&nouv);
+    */
+    /*
+    printf("Entrer votre couleur (avec une majuscule au debut):");
+    char a;
+    scanf("%s", &a);
+    printf("\nDamier pour le %s :\n", &a);
+    printf("%s",&a);
+    Rotation_Couleur(&jeu, &temp1, &temp2, &temp3, a);
+    */
+    printf("\n exemple: Damier pour le joueur vert :\n");
+    Rotation_Couleur(&jeu, &temp1, &temp2, &temp3, Bleu);
+
+    return 0;
+}
