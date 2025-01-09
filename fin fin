@@ -82,8 +82,10 @@ typedef enum {
 
 void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur);
 
+/*
+Fonction pour vérifier si une cellule appartient à un coin cyan
+*/
 
-// Fonction pour vérifier si une cellule appartient à un coin cyan
 int Coin_Cyan(int i, int j) {
     return ((i >= 0 && i < 4 && j >= 0 && j < 4) ||       // Coin supérieur gauche
             (i >= 13 && i < TAILLE && j >= 0 && j < 4) || // Coin inférieur gauche
@@ -91,7 +93,10 @@ int Coin_Cyan(int i, int j) {
             (i >= 13 && i < TAILLE && j >= 13 && j < TAILLE)); // Coin inférieur droit
 }
 
-// Initialise le damier
+/*
+Initialisation du damier
+*/
+
 void init_damier(Damier* jeu) {
     jeu->nb_bleu = 22;
     jeu->nb_rouge = 22;
@@ -142,7 +147,8 @@ void init_damier(Damier* jeu) {
 
 /*
  * Affiche une cellule selon son état dans le damier.
- */
+*/
+
 void afficher_Cellule(int i, int j, int index[TAILLE][TAILLE]) {
     if (Coin_Cyan(i, j)) {
         printf(FOND_CYAN "   " RESET); // Fond cyan sans traits noirs
@@ -186,11 +192,14 @@ void afficher_Cellule(int i, int j, int index[TAILLE][TAILLE]) {
         }
     }
 }
+
+
 /*
- * Affiche le damier complet avec les indices en haut et à gauche.
+ Affiche le damier complet avec les indices en haut et à gauche, c'est le damier de référence avec le joueur rouge en bas
  */
+
 void afficher_Damier(Damier* jeu) {
-    // Affiche les indices des colonnes (a à q) en haut
+    // Affiche les indices des colonnes (1 à 16) en haut
     printf("   "); 
     for (int j = 0; j < TAILLE; j++) {
          if (j<=9){
@@ -205,7 +214,7 @@ void afficher_Damier(Damier* jeu) {
     printf("\n");
 
     for (int i = 0; i < TAILLE; i++) {
-        // Affiche les indices des lignes (A à Q) à gauche
+        // Affiche les indices des lignes (1 à 16) à gauche
         if (i<=9){
             printf(TXT_BLEU " %d "RESET, i);
         }
@@ -220,6 +229,9 @@ void afficher_Damier(Damier* jeu) {
     }
 }
 
+ /*
+Fonction qui renvoie la couleur du joueur selon le pion
+*/
 
 int couleur_de_case(Damier* jeu, int x, int y){ // x depart, y arrivee
     switch(jeu->index[x][y]){
@@ -234,7 +246,10 @@ int couleur_de_case(Damier* jeu, int x, int y){ // x depart, y arrivee
     }
 }
 
-// Fonction pour déterminer l'état d'une case
+/*
+ Fonction pour déterminer l'état d'une case
+*/
+
 EtatCase etat_case(int i, int j, Damier* jeu) {
     if (Coin_Cyan(i, j)) {
         return NON_AFFECTABLE; // Cases des coins cyan
@@ -259,7 +274,10 @@ EtatCase etat_case(int i, int j, Damier* jeu) {
     }
 }
 
-// Une fois dans le damier
+ /*
+ Affichage du Damier avec l'état des cases au lieu des pions
+*/
+
 void afficher_etats_cases(Damier* jeu) {
     printf("États des cases :\n\n");
     for (int i = 0; i < TAILLE; i++) {
@@ -281,6 +299,10 @@ void afficher_etats_cases(Damier* jeu) {
         printf("\n");
     }
 }
+
+/*
+Fonction qui permet le déplacement du pion
+*/
 
 Damier* mvt(Damier* jeu, Couleur_joueur couleur){
     int nb_cases_bleu, nb_casses_rouge, nb_cases_jaune,nb_cases_vert;
@@ -320,7 +342,10 @@ Damier* mvt(Damier* jeu, Couleur_joueur couleur){
         int chiffre1=abs(case_fin.j- case_debut.j);
         int chiffre2=abs(case_fin.i- case_debut.i);
         if (abs(case_fin.j- case_debut.j)==abs(case_fin.i- case_debut.i)){
-            if(abs(case_fin.j- case_debut.j)==1){ //mouvement simple
+            if(abs(case_fin.j- case_debut.j)==1){ 
+                /*
+                        MOUVEMENT SIMPLE
+                */
                 switch (couleur) {
                     case Rouge:
                         if (abs(case_fin.i- case_debut.i)==1){
@@ -396,7 +421,10 @@ Damier* mvt(Damier* jeu, Couleur_joueur couleur){
                         pas_fini=1;
             }}
             else{
-                if(abs(case_fin.j- case_debut.j)==2){ //mouvement avec saut {
+                if(abs(case_fin.j- case_debut.j)==2){ 
+                    /*
+                        MOUVEMENT AVEC SAUT
+                    */
                     printf("Mouvement valide");
                     Case case_intermediaire;
                     case_intermediaire.i=(case_fin.j - case_debut.j)/2+case_debut.j;
@@ -459,7 +487,7 @@ Damier* mvt(Damier* jeu, Couleur_joueur couleur){
                                     jeu->nb_vert=jeu->nb_vert-2;
                                     break;
                             }    
-                            printf("Continuer le coup ? (0:non, 1:oui)");
+                            printf("\nContinuer le coup ? (0:non, 1:oui)");
                             scanf("%d",&reponse);
                             pas_fini=reponse; 
                         
@@ -512,6 +540,7 @@ Damier* rotationDamier(Damier* jeu,Damier* temp) {
 /* 
 Fonction pour afficher le damier avec une rotation des indices
 */
+
 void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
     // Affiche les indices des colonnes (a à q) en haut
     switch(couleur){
@@ -636,9 +665,11 @@ void afficherDamier(Damier* jeu,Damier* temp, Couleur_joueur couleur) {
             
     }
 }
+
 /* 
 Fonction qui fait la rotation selon la couleur du joueur
 */
+
 void Rotation_Couleur(Damier* jeu, Damier* temp1, Damier* temp2,Damier* temp3,Couleur_joueur couleur){
 
     switch (couleur) {
@@ -659,8 +690,8 @@ void Rotation_Couleur(Damier* jeu, Damier* temp1, Damier* temp2,Damier* temp3,Co
 /* 
 Fonction qui fait le jeu: affiche le joueur actuel en bas (rotation) avec le deplacement par couleur(mvt). On a choisi l'ordre des joueurs suivant : Rouge, Jaune, Bleu, Vert
 */
+
 void total(Damier* jeu, bool* fin){
-    
     Damier* nb_bleu,nb_vert,nb_jaune,nb_rouge;
     Damier temp, temp1, temp2, temp3;
     Couleur_joueur couleur;
